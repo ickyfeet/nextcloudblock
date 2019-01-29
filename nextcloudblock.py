@@ -35,3 +35,5 @@ for i in results:
         bannedips.write(i["ip"] + "\n")
 
         iplist.add(i["ip"])
+
+bannedips.close()
