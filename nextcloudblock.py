@@ -52,7 +52,7 @@ if args.outputfile:
     # Open the file
     bannedips = open(filename, 'w')
 
-    # Connect to database server
+    # Declare connection to database server
     cursor = dbconnection.cursor()
 
     # Execute the sql query
@@ -72,11 +72,15 @@ if args.outputfile:
 
             iplist.add(i["ip"])
 
+    # Close the file
     bannedips.close()
+
+    # Close database connection
+    cursor.close()
 
 else:
 
-    # Connect to database server
+    # Declare connection to database server
     cursor = dbconnection.cursor()
 
     # Generate SQL command
@@ -90,3 +94,6 @@ else:
 
     #  Let the person know the IP was removed from the list
     print('Unbanned ip address ' + args.unban)
+
+    # Close database connection
+    cursor.close()
