@@ -2,7 +2,7 @@ import os
 import argparse
 import pymysql
 
-"""Initialize arparse"""
+# Initialize arparse
 parser = argparse.ArgumentParser()
 
 """Argument Parser:
@@ -32,36 +32,39 @@ parser.add_argument("-o", "--outputfile", required=False,
 parser.add_argument("-b", "--unban", required=False,
                     type=str, help="ip address to unban")
 
-"""Assign arguments to args"""
-
+# Assign arguments to args
 args = parser.parse_args()
 
-"""Declare PyMySql database connection"""
-
+# Declare PyMySql database connection
 dbconnection = pymysql.connect(host=args.dbserver, user=args.dbuser,
                                password=args.dbpassword, db=args.db,
                                cursorclass=pymysql.cursors.DictCursor)
 
-"""If there's an output file connect to database and pull IP address"""
-
+# If there's an output file connect to database and pull IP address
 if args.outputfile:
 
-    path, filename = os.path.split(args.outputfile) #Split file name from pat
+    # Split file name from pat
+    path, filename = os.path.split(args.outputfile)
 
-    os.chdir(path) #Change Directory to path
+    # Change Directory to path
+    os.chdir(path)
 
-    bannedips = open(filename, 'w') #Open the file
+    # Open the file
+    bannedips = open(filename, 'w')
 
-    cursor = dbconnection.cursor() #Connect to database server
+    # Connect to database server
+    cursor = dbconnection.cursor()
 
-    cursor.execute("SELECT * FROM oc_bruteforce_attempts;") #Execute the sql query
+    # Execute the sql query
+    cursor.execute("SELECT * FROM oc_bruteforce_attempts;")
 
-    results = cursor.fetchall() #Fetch all results
+    # Fetch all results
+    results = cursor.fetchall()
 
-    """Initialize the list of IP addresses and remove duplicates and write to file"""
-
+    # Initialize the list of IP addresses
     iplist = set()
 
+    # Remove duplicates and write them to a file
     for i in results:
         if i['ip'] not in iplist:
 
@@ -70,17 +73,20 @@ if args.outputfile:
             iplist.add(i["ip"])
 
     bannedips.close()
-    
+
 else:
 
-    """Unban the IP address provided from the command line arguments"""
-
+    # Connect to database server
     cursor = dbconnection.cursor()
 
+    # Generate SQL command
     unbansql = "DELETE FROM oc_bruteforce_attempts WHERE ip = '" + args.unban + "';"
 
+    # Prepare to execute the SQL command
     cursor.execute(unbansql)
 
+    # Execute the command
     dbconnection.commit()
 
+    #  Let the person know the IP was removed from the list
     print('Unbanned ip address ' + args.unban)
