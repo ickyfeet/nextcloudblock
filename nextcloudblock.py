@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser()
     --dbserver:  Database server to connect to, required
     --outputfile:  File to ouput list to, optional
     --unban:  IP address to unban
+    --view:  View the list of IP addresses
 """
 
 parser.add_argument("-u", "--dbuser", required=True, type=str,
@@ -32,6 +33,9 @@ parser.add_argument("-o", "--outputfile", required=False,
 parser.add_argument("-b", "--unban", required=False,
                     type=str, help="ip address to unban")
 
+parser.add_argument("-v", "--view", required=False,
+                    action='store_true', help="print the list to")
+
 # Assign arguments to args
 args = parser.parse_args()
 
@@ -40,45 +44,7 @@ dbconnection = pymysql.connect(host=args.dbserver, user=args.dbuser,
                                password=args.dbpassword, db=args.db,
                                cursorclass=pymysql.cursors.DictCursor)
 
-# If there's an output file connect to database and pull IP address
-if args.outputfile:
-
-    # Split file name from pat
-    path, filename = os.path.split(args.outputfile)
-
-    # Change Directory to path
-    os.chdir(path)
-
-    # Open the file
-    bannedips = open(filename, 'w')
-
-    # Declare connection to database server
-    cursor = dbconnection.cursor()
-
-    # Execute the sql query
-    cursor.execute("SELECT * FROM oc_bruteforce_attempts;")
-
-    # Fetch all results
-    results = cursor.fetchall()
-
-    # Initialize the list of IP addresses
-    iplist = set()
-
-    # Remove duplicates and write them to a file
-    for i in results:
-        if i['ip'] not in iplist:
-
-            bannedips.write(i["ip"] + "\n")
-
-            iplist.add(i["ip"])
-
-    # Close the file
-    bannedips.close()
-
-    # Close database connection
-    cursor.close()
-
-else:
+if args.unban:
 
     # Declare connection to database server
     cursor = dbconnection.cursor()
@@ -94,6 +60,54 @@ else:
 
     #  Let the person know the IP was removed from the list
     print('Unbanned ip address ' + args.unban)
+
+    # Close database connection
+    cursor.close()
+
+else:
+
+    # Declare connection to database server
+    cursor = dbconnection.cursor()
+
+    # Execute the sql query
+    cursor.execute("SELECT * FROM oc_bruteforce_attempts;")
+
+    # Fetch all results
+    results = cursor.fetchall()
+
+    # Initialize the list of IP addresses
+    iplist = set()
+
+    if args.outputfile:
+
+        # Split file name from pat
+        path, filename = os.path.split(args.outputfile)
+
+        # Change Directory to path
+        os.chdir(path)
+
+        # Open the file
+        bannedips = open(filename, 'w')
+
+    # Remove duplicates and write them to a file or display them
+    for i in results:
+
+        if i['ip'] not in iplist:
+
+            if args.outputfile:
+
+                bannedips.write(i["ip"] + "\n")
+
+            if args.view:
+
+                print(i['ip'])
+
+            iplist.add(i["ip"])
+
+    if args.outputfile:
+
+        # Close the file
+        bannedips.close()
 
     # Close database connection
     cursor.close()
