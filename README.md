@@ -25,5 +25,5 @@ Usage:
   * python3 nextcloudblock.py -u dbuser -p dbuserpassword -d databasename -s serverip -b unbanip
 
 * View list of banned IP addresses
-  * python3 nextcloudblock.py -u db user -p dbuserpassword -d databasename -s serverip -v
+  * python3 nextcloudblock.py -u dbuser -p dbuserpassword -d databasename -s serverip -v
 
