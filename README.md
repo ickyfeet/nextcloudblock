@@ -1,6 +1,6 @@
 # nextcloudblock
 
-Pulls the banned IP list and writes them to a file
+Allows you to manage the IP addresses banned by nextcloud
 
 
 Requires PyMySql
